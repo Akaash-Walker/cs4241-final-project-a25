@@ -8,7 +8,8 @@
     "dev:server": "nodemon src/server/server.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node dist/server/server.js && vite preview"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.5.0",

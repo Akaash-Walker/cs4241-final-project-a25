@@ -1,9 +1,16 @@
 import {GeoJSON, MapContainer} from "react-leaflet"
 import "leaflet/dist/leaflet.css";
 import "./Heatmap.css"
-import type {GeoJSON as GeoJSONType} from "geojson";
+import type {Feature, FeatureCollection, Geometry} from "geojson";
 import axios from "axios";
 import LoadCountriesTask from "../../tasks/LoadCountriesTask";
+import {Layer, type PathOptions} from "leaflet";
+
+type CountryProps = {
+    color: string;
+    ADMIN: string;
+    ISO_A3: string;
+};
 
 async function getUserEmail(accessToken: string | null): Promise<string> {
     try {
@@ -14,9 +21,9 @@ async function getUserEmail(accessToken: string | null): Promise<string> {
             }
         });
         return res.data.email;
-    } catch (error: Error) {
-        console.error("Failed to fetch Spotify user info:", error.response?.data || error.message);
-        throw error;
+    } catch (error: unknown) {
+        console.error("Error fetching user email:", error);
+        throw new Error("Failed to fetch user email");
     }
 }
 
@@ -24,9 +31,8 @@ async function getUserEmail(accessToken: string | null): Promise<string> {
 const access_token = localStorage.getItem('access_token');
 const username = await getUserEmail(access_token);
 
-const Heatmap = ({countries}: { countries: GeoJSONType }) => {
-
-    const mapStyle = {
+const Heatmap = ({countries}: { countries: FeatureCollection<Geometry, CountryProps> }) => {
+    const baseStyle: PathOptions = {
         fillColor: "#404040ff",
         weight: 1,
         color: "#898989",
@@ -34,23 +40,28 @@ const Heatmap = ({countries}: { countries: GeoJSONType }) => {
     };
 
 
-    const onEachCountry = (country: { properties: { color: string; ADMIN: string; ISO_A3: string; }; }, layer: {
-        options: { fillColor: string; };
-        bindPopup: (arg0: string) => void;
-    }) => {
-        layer.options.fillColor = country.properties.color;
-        const name = country.properties.ADMIN;
+    const onEachCountry = (feature: Feature<Geometry, CountryProps>, layer: Layer) => {
+        const name = feature.properties.ADMIN;
         const loadCountriesTask = new LoadCountriesTask();
-        loadCountriesTask.getArtists(country.properties.ISO_A3, username).then(artists => {
+        loadCountriesTask.getArtists(feature.properties.ISO_A3, username).then((artists: string[]) => {
             const artistList = artists.join("<br>");
-            layer.bindPopup(`<b>${name}</b><br>${artistList}`);
-        })
+            if ("bindPopup" in layer && typeof (layer as any).bindPopup === "function") {
+                (layer as any).bindPopup(`<b>${name}</b><br>${artistList}`);
+            }
+        });
     };
 
 
     return (
         <MapContainer className="h-[calc(82vh)]" zoom={2} center={[30, 0]} minZoom={2}>
-            <GeoJSON style={mapStyle} data={countries} onEachFeature={onEachCountry}/>
+            <GeoJSON
+                data={countries}
+                style={(feature) => ({
+                    ...baseStyle,
+                    fillColor: (feature?.properties as CountryProps | undefined)?.color ?? baseStyle.fillColor,
+                })}
+                onEachFeature={onEachCountry}
+            />
         </MapContainer>
     )
 }

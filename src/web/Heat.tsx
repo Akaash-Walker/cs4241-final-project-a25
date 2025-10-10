@@ -12,7 +12,7 @@ const Heatmap = lazy(() => import('./components/Heatmap.tsx'));
 
 const hasRun = { current: false };
 
-type CountryGeoJSON = GeoJSON.FeatureCollection;
+type CountryGeoJSON = GeoJSON.Feature<GeoJSON.Geometry, { color: string; ADMIN: string; ISO_A3: string; }>;
 
 const Heat = () => {
     const [countries, setCountries] = useState<CountryGeoJSON[] | null>(null);
@@ -94,12 +94,12 @@ const Heat = () => {
     return (
         <div>
             <Suspense fallback={<Loading />}>
-                {loading ? (
+                {loading && !countries ? (
                     <Loading />
                 ) : (
                     <>
                         <NoUserNav />
-                        <Heatmap countries={countries} />
+                        <Heatmap countries={{ type: "FeatureCollection", features: countries ?? [] }} />
                         <Legend legendItems={legendItemsInReverse} />
                     </>
                 )}

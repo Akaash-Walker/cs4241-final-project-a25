@@ -1,11 +1,22 @@
-const Legend = ({legendItems}) => {
+type LegendItem = {
+    title: string;
+    color: string;
+    textColor: string;
+}
+
+type LegendProps = {
+    legendItems: LegendItem[];
+}
+
+
+const Legend = ({legendItems}: LegendProps) => {
     return (
     <div 
     style = {{
         display: "flex",
         alignItems: "stretch"
     }}>
-        {legendItems.map((item)=> (
+        {legendItems.map((item: LegendItem)=> (
             <div
             key = {item.title}
             style={{

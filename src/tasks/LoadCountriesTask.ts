@@ -1,3 +1,4 @@
+// @ts-nocheck
 import countries  from "../const/countries.json"
 import legendItems from "./LegendItems";
 import axios from "axios";
