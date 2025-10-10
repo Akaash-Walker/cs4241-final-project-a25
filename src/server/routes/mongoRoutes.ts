@@ -24,8 +24,7 @@ router.get("/docs", async (_req, res) => {
 
 router.post("/load", async (req, res) => {
     //const data = req.body.list;
-    const tempUser = req.body.userId;
-    const userId = tempUser.replace(/[@,.]/g, "");
+    const userId = req.body.userId;
     const response = req.body.response;
 
     console.log("User ID: ", userId);
