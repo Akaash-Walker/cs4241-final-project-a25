@@ -9,8 +9,14 @@ const router = Router();
 dotenv.config();
 
 const client_id = "cb8bfc95d6e344a89d9f9033d8e440c0"
-const redirect_uri = `${process.env.ROOT_URL}/api/callback`
+const root_url = process.env.ROOT_URL;
 const client_secret = process.env.CLIENT_SECRET;
+
+if (!root_url) {
+    throw new Error("Missing ROOT_URL environment variable");
+}
+
+const redirect_uri = `${process.env.ROOT_URL}/api/callback`
 
 if (!client_secret) {
     throw new Error("Missing CLIENT_SECRET environment variable");
@@ -90,7 +96,7 @@ router.get('/callback', function (req, res) {
                     });
 
                     // pass token and redirect to /heat to make requests
-                    res.redirect('http://127.0.0.1:5173/heat#' +
+                    res.redirect(`${root_url}/heat#` +
                         querystring.stringify({
                             access_token: access_token,
                             refresh_token: refresh_token
