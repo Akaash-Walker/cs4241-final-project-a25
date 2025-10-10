@@ -1,6 +1,6 @@
 import {GoogleGenAI, Type} from "@google/genai";
 import {Router} from "express";
-import geminiPrompt from "../../../lib/geminiPrompt.ts";
+import geminiPrompt from "../geminiPrompt.js";
 
 export const router = Router();
 

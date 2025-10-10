@@ -1,4 +1,4 @@
-import MongoConnection from "../mongoConnection.ts";
+import MongoConnection from "../mongoConnection.js";
 import type {Collection} from "mongodb";
 import {Router} from "express";
 

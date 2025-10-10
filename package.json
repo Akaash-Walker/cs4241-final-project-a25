@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "dev:server": "nodemon src/server/server.ts",
-    "build": "tsc -b && vite build",
+    "dev:server": "nodemon --watch src/server --ext ts,tsx --exec \"node --loader ts-node/esm src/server/server.ts\"",
+    "build": "vite build && tsc -p tsconfig.server.json",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node dist/server/server.js && vite preview"
+    "start": "node dist/server/server.js"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.5.0",

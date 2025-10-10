@@ -2,9 +2,9 @@
 import * as dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-import spotifyRoutes from "./routes/spotifyRoutes.ts";
-import mongoRoutes from "./routes/mongoRoutes.ts";
-import geminiRoutes from "./routes/geminiRoutes.ts";
+import spotifyRoutes from "./routes/spotifyRoutes.js";
+import mongoRoutes from "./routes/mongoRoutes.js";
+import geminiRoutes from "./routes/geminiRoutes.js";
 import express from 'express';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,6 +22,28 @@ app.use(express.json());
 app.use('/api', spotifyRoutes);
 app.use('/api', mongoRoutes);
 app.use('/api', geminiRoutes);
+
+const CLIENT_DIST_DIR = path.resolve(__dirname, "..");
+
+app.use(
+    "/assets",
+    express.static(path.join(CLIENT_DIST_DIR, "assets"), {
+        immutable: true,
+        maxAge: "1y"
+    })
+);
+
+app.use(express.static(CLIENT_DIST_DIR));
+
+app.get(/^(?!\/api)(?!\/assets\/).+/, (req, res, next) => {
+    const accept = req.headers.accept || "";
+    if (accept.includes("text/html")) {
+        res.sendFile(path.join(CLIENT_DIST_DIR, "index.html"));
+    } else {
+        next();
+    }
+});
+
 
 // start the server
 app.listen(port, () => {
